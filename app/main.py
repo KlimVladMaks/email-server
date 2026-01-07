@@ -1,7 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from . import schemas, crud
-from .database import get_db
+from . import models, schemas, crud
+from .database import engine, get_db
+
+# Создаём таблицы в БД
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
