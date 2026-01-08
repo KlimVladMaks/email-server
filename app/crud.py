@@ -23,3 +23,12 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
 
     return db_user
+
+def authenticate_user(db: Session, username: str, password: str):
+    """Аутентификация пользователя"""
+    user = get_user_by_username(db, username)
+    if not user:
+        return False
+    if not utils.verify_password(password, user.password):
+        return False
+    return user
