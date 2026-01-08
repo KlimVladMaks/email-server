@@ -1,12 +1,24 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from starlette.middleware.sessions import SessionMiddleware
+from sqladmin import Admin
 from . import models, schemas, crud
 from .database import engine, get_db
+from .admin import AdminAuth, UserAdmin
 
 # Создаём таблицы в БД
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# Добавляем поддержку сессий для всего приложения
+app.add_middleware(SessionMiddleware, secret_key="secret-key")
+
+# Создаём админ-панель (используем тот же секретный ключ)
+admin = Admin(app, engine, authentication_backend=AdminAuth(secret_key="secret-key"))
+
+# Регистрируем модели в админ-панели
+admin.add_view(UserAdmin)
 
 @app.post("/register", response_model=schemas.UserResponse)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
