@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 from sqladmin import Admin
@@ -42,3 +43,21 @@ def read_root():
     Тестовый endpoint для проверки работы API
     """
     return {"message": "API работает"}
+
+@app.post("/login")
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    """
+    Вход пользователя с созданием сессии
+    """
+    # Авторизация пользователя
+    user = crud.authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Неверное имя пользователя или пароль",
+        )
+    
+    session = crud.create_session(db, user.id)

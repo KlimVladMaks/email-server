@@ -32,3 +32,12 @@ def authenticate_user(db: Session, username: str, password: str):
     if not utils.verify_password(password, user.password):
         return False
     return user
+
+def create_session(db: Session, user_id: int):
+    """Создание новой сессии пользователя"""
+    token = utils.generate_session_token()
+
+    session = models.Session(
+        token = token,
+        user_id = user_id
+    )
