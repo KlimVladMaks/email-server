@@ -46,3 +46,9 @@ def create_session(db: Session, user_id: int):
     db.commit()
     db.refresh(session)
     return session
+
+def logout_session(db: Session, token: str):
+    """Завершение сессии (logout)"""
+    session = db.query(models.Session).filter(
+        models.Session.token == token
+    ).first()

@@ -62,4 +62,13 @@ async def login(
     
     session = crud.create_session(db, user.id)
 
-    return {"token": session.token}
+    return {
+        "token": session.token,
+        "type": "Bearer"
+        }
+
+@app.post("/logout")
+async def logout(
+
+):
+    pass
