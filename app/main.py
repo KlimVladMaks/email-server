@@ -1,11 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, Header, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 from sqladmin import Admin
 from . import models, schemas, crud
 from .database import engine, get_db
-from .admin import AdminAuth, UserAdmin
+from .admin import AdminAuth, UserAdmin, SessionAdmin
 
 # Создаём таблицы в БД
 models.Base.metadata.create_all(bind=engine)
@@ -20,6 +20,7 @@ admin = Admin(app, engine, authentication_backend=AdminAuth(secret_key="secret-k
 
 # Регистрируем модели в админ-панели
 admin.add_view(UserAdmin)
+admin.add_view(SessionAdmin)
 
 @app.post("/register", response_model=schemas.UserResponse)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -69,6 +70,13 @@ async def login(
 
 @app.post("/logout")
 async def logout(
-
+    authorization: str = Header(None),
+    db: Session = Depends(get_db)
 ):
-    pass
+    """
+    Выход пользователя - завершаем текущую сессию
+    """
+    if authorization and authorization.startswith("Bearer "):
+        session_token = authorization.replace("Bearer ", "")
+        crud.logout_session(db, session_token)
+    return {"message": "Успешный выход"}
