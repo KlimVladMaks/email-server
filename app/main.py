@@ -61,3 +61,5 @@ async def login(
         )
     
     session = crud.create_session(db, user.id)
+
+    return {"token": session.token}

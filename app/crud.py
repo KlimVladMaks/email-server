@@ -41,3 +41,8 @@ def create_session(db: Session, user_id: int):
         token = token,
         user_id = user_id
     )
+
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+    return session
