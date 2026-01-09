@@ -52,3 +52,9 @@ def logout_session(db: Session, token: str):
     session = db.query(models.Session).filter(
         models.Session.token == token
     ).first()
+
+    if session:
+        db.delete(session)
+        db.commit()
+        return True
+    return False
