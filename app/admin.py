@@ -32,7 +32,7 @@ class UserAdmin(ModelView, model=User):
     """
     Модель для отображения пользователей в админ-панели
     """
-    column_list = [User.id, User.username, User.is_active]
+    column_list = [User.id, User.username]
     column_searchable_list = [User.username]
     column_sortable_list = [User.id, User.username]
     column_details_exclude_list = [User.password]

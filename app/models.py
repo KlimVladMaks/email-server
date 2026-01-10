@@ -8,7 +8,6 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True)
 
     sessions = relationship("Session", back_populates="user", cascade="all, delete-orphan")
 
