@@ -4,3 +4,4 @@ passlib
 sqladmin
 itsdangerous
 jose
+requests
