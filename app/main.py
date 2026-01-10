@@ -45,7 +45,7 @@ def read_root():
     """
     return {"message": "API работает"}
 
-@app.post("/login")
+@app.post("/login", response_model=schemas.TokenResponse)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
