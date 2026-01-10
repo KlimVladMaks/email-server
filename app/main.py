@@ -23,7 +23,10 @@ admin.add_view(UserAdmin)
 admin.add_view(SessionAdmin)
 
 @app.post("/register", response_model=schemas.UserResponse)
-def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+def register(
+    user: schemas.UserCreate,
+    db: Session = Depends(get_db)
+):
     """
     Регистрация нового пользователя
     """
@@ -86,5 +89,21 @@ async def logout(
             return {"message": "Успешный выход"}
         else:
             raise HTTPException(status_code=404, detail="Сессия не найдена")
+    else:
+        raise HTTPException(status_code=400, detail="Неверный заголовок Authorization")
+
+@app.get("/users/me", response_model=schemas.UserResponse)
+def get_me_user(
+    authorization: str = Header(None),
+    db: Session = Depends(get_db)
+):
+    """Получить текущего пользователя"""
+    if authorization and authorization.startswith("Bearer "):
+        session_token = authorization.replace("Bearer ", "")
+        user = crud.get_user_by_token(db, session_token)
+        if user:
+            return user
+        else:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
     else:
         raise HTTPException(status_code=400, detail="Неверный заголовок Authorization")

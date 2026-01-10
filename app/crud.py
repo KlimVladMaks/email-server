@@ -57,3 +57,10 @@ def logout_session(db: Session, token: str):
         db.commit()
         return True
     return False
+
+def get_user_by_token(db: Session, token: str):
+    """Получить пользователя по токену его сессии"""
+    session = db.query(Session).filter_by(token=token).first()
+    if session:
+        return session.user
+    return None
