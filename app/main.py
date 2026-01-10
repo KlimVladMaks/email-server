@@ -78,5 +78,13 @@ async def logout(
     """
     if authorization and authorization.startswith("Bearer "):
         session_token = authorization.replace("Bearer ", "")
-        crud.logout_session(db, session_token)
-    return {"message": "Успешный выход"}
+        try:
+            deleted = crud.logout_session(db, session_token)
+        except Exception:
+            raise HTTPException(status_code=500, detail="Ошибка сервера при завершении сессии")
+        if deleted:
+            return {"message": "Успешный выход"}
+        else:
+            raise HTTPException(status_code=404, detail="Сессия не найдена")
+    else:
+        raise HTTPException(status_code=400, detail="Неверный заголовок Authorization")
