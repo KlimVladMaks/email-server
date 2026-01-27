@@ -1,4 +1,5 @@
 from pathlib import Path
+import subprocess
 
 
 class Server:
@@ -15,4 +16,20 @@ class Server:
         self.process = None
     
     def start(self):
-        print(self.main_app)
+        # Собираем команду для запуска сервера
+        command = (
+            f"cd {self.project_root} && "
+            f"source {self.venv_activate} && "
+            f"fastapi dev {self.main_app}"
+        )
+
+        print("Запускаем сервер...")
+
+        # Запускаем сервер в подпроцессе
+        self.process = subprocess.Popen(
+            command,
+            shell=True,
+            executable="/bin/bash"
+        )
+
+        print("Сервер запущен")
