@@ -6,18 +6,17 @@ import time
 
 class Server:
     def __init__(self):
-        # Определяем основные пути для запуска сервера:
-        # Корневой путь проекта
+        # Путь к корню проекта
         self.project_root = Path(__file__).parent.parent
-        # Путь к main.py файлу
+        # Путь к стартовому файлу main.py
         self.main_app = self.project_root / "app" / "main.py"
-
+    
         # Процесс, в котором будет запущен сервер
         self.process = None
     
     def start(self):
         """Запуск сервера"""
-        # Команда для запуска uvicorn
+        # Команда для запуска сервера
         command = [
             "uvicorn",
             "app.main:app",
@@ -28,27 +27,22 @@ class Server:
 
         print("Запускаем сервер...")
 
-        # Запускаем процесс
+        # Запускаем сервер с отдельном процессе
         self.process = subprocess.Popen(
             command,
             cwd=self.project_root,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
             env={**os.environ, "VIRTUAL_ENV": str(self.project_root / ".venv")}
         )
 
-        time.sleep(5)
+        time.sleep(3)
 
         if self.process.poll() is None:
             print("Сервер запущен")
         else:
-            stderr = self.process.stderr.read()
-            print(f"Ошибка запуска сервера: {stderr}")
+            print("Ошибка при запуске сервера")
 
     def stop(self):
         """Остановка сервера"""
-        if self.process:
-            self.process.terminate()
-            self.process.wait()
-            print("Сервер остановлен")
+        self.process.terminate()
+        self.process.wait()
+        print("Сервер остановлен")

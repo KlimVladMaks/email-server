@@ -27,6 +27,8 @@ class Test_1:
     def start_test(self):
         server = Server()
         server.start()
+        input("Остановить сервер?")
+        server.stop()
 
 
 if __name__ == "__main__":
