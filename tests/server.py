@@ -1,5 +1,7 @@
 from pathlib import Path
 import subprocess
+import os
+import time
 
 
 class Server:
@@ -7,8 +9,6 @@ class Server:
         # Определяем основные пути для запуска сервера:
         # Корневой путь проекта
         self.project_root = Path(__file__).parent.parent
-        # Путь для активации venv
-        self.venv_activate = self.project_root / ".venv" / "bin" / "activate"
         # Путь к main.py файлу
         self.main_app = self.project_root / "app" / "main.py"
 
@@ -16,20 +16,39 @@ class Server:
         self.process = None
     
     def start(self):
-        # Собираем команду для запуска сервера
-        command = (
-            f"cd {self.project_root} && "
-            f"source {self.venv_activate} && "
-            f"fastapi dev {self.main_app}"
-        )
+        """Запуск сервера"""
+        # Команда для запуска uvicorn
+        command = [
+            "uvicorn",
+            "app.main:app",
+            "--host", "127.0.0.1",
+            "--port", "8000",
+            "--reload"
+        ]
 
         print("Запускаем сервер...")
 
-        # Запускаем сервер в подпроцессе
+        # Запускаем процесс
         self.process = subprocess.Popen(
             command,
-            shell=True,
-            executable="/bin/bash"
+            cwd=self.project_root,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            env={**os.environ, "VIRTUAL_ENV": str(self.project_root / ".venv")}
         )
 
-        print("Сервер запущен")
+        time.sleep(5)
+
+        if self.process.poll() is None:
+            print("Сервер запущен")
+        else:
+            stderr = self.process.stderr.read()
+            print(f"Ошибка запуска сервера: {stderr}")
+
+    def stop(self):
+        """Остановка сервера"""
+        if self.process:
+            self.process.terminate()
+            self.process.wait()
+            print("Сервер остановлен")
