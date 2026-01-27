@@ -25,3 +25,9 @@ fastapi dev app/main.py
 ```
 http://127.0.0.1:8000/admin/
 ```
+
+## Запуск тестов
+
+```
+python -m tests.tests
+```
