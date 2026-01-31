@@ -46,7 +46,7 @@ def read_root():
     """
     Тестовый endpoint для проверки работы API
     """
-    return {"message": "API работает"}
+    return "email_server"
 
 @app.post("/login", response_model=schemas.TokenResponse)
 async def login(

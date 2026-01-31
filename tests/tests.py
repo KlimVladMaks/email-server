@@ -11,12 +11,17 @@ class Test_1:
         return response
 
     def start_test(self):
-        server = Server()
-        server.start()
-        input("Остановить сервер?")
-        server.stop()
+        print("Тест 1")
 
 
 if __name__ == "__main__":
-    test = Test_1()
-    test.start_test()
+    # Запускаем сервер перед тестами
+    server = Server()
+    server.start()
+
+    # Тесты:
+    test_1 = Test_1()
+    test_1.start_test()
+
+    # Останавливаем сервер после тестов
+    server.stop()
