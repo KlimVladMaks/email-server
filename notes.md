@@ -31,3 +31,16 @@ http://127.0.0.1:8000/admin/
 ```
 python -m tests.tests
 ```
+
+## Работа с процессами uvicorn
+
+```
+# Найти все процессы uvicorn
+pgrep -fl uvicorn
+
+# Убить конкретный процесс
+kill <id_процесса>
+
+# Убить все процессы uvicorn
+kill $(pgrep -f uvicorn)
+```

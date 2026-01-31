@@ -2,6 +2,7 @@ from pathlib import Path
 import subprocess
 import os
 import time
+import requests
 
 
 class Server:
@@ -20,12 +21,34 @@ class Server:
         # Процесс, в котором будет запущен сервер
         self.process = None
     
-    def wait_for_port(host: str, port: int, timeout: int = 30) -> bool:
+    def wait_for_server(self, host: str, port: int, timeout: int = 30) -> bool:
         """
-        Метод для проверки доступности порта.
-        Если порт работает, то возвращается True, если нет, то возвращается False.
+        Метод для проверки доступности сервера.
+        Если сервер работает, то возвращается True, если нет, то возвращается False.
         """
-        pass
+        start_time = time.time()
+        url = f"http://{host}:{port}/"
+
+        while time.time() - start_time < timeout:
+            try:
+                response = requests.get(url, timeout=2)
+
+                # Если нужный ответ успешно получен, то возвращаем True
+                if response.status_code == 200 and "email_server" in response.text:
+                    return True
+            
+            # Если не удалось подключиться к серверу, то ждём и пробуем снова
+            except (requests.ConnectionError, requests.Timeout):
+                time.sleep(1)
+            except requests.RequestException as e:
+                print(f"Ошибка при проверке сервера: {e}")
+                time.sleep(1)
+            except Exception as e:
+                print(f"Неожиданная ошибка: {e}")
+                break
+        
+        # Если сервер так и не запустился, то возвращаем False
+        return False
     
     def start(self):
         """Запуск сервера"""
@@ -40,19 +63,18 @@ class Server:
 
         print("Запускаем сервер...")
 
-        # Запускаем сервер с отдельном процессе
+        # Запускаем сервер в отдельном процессе
         self.process = subprocess.Popen(
             command,
             cwd=self.project_root,
             env={**os.environ, "VIRTUAL_ENV": str(self.project_root / ".venv")}
         )
 
-        time.sleep(3)
-
-        if self.process.poll() is None:
-            print("Сервер запущен")
+        # Проверяем, что сервер работает корректно
+        if self.wait_for_server("127.0.0.1", 8000):
+            print("✓ Сервер запущен и работает корректно!")
         else:
-            print("Ошибка при запуске сервера")
+            print("✗ Ошибка: сервер не запустился или работает некорректно")
 
     def stop(self):
         """Остановка сервера"""
